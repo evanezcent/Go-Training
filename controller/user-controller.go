@@ -66,7 +66,7 @@ func (c *authController) Register(ctx *gin.Context) {
 		return
 	}
 
-	if c.authService.IsDuplicateEmail(newUser.Email) {
+	if !c.authService.IsDuplicateEmail(newUser.Email) {
 		res := helper.ResponseFailed("Email has ben registered", "Failed", nil)
 		ctx.JSON(http.StatusConflict, res)
 	} else {
