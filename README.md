@@ -6,7 +6,7 @@ Training to develop RESTfull API using Golang and MySQL
 
 1. Install the package that listed in tech stack
 2. Run using your cmd with command `go run main.go`
-3. Open http://localhost:8080/user/ `login` or `register` to view it in the browser.
+3. Open http://localhost:8080/user/ `login` or `register` to test it on your postman or etc 
 
 ## Tech Stack
 1. [Gin-Gonic](https://github.com/gin-gonic/gin)
