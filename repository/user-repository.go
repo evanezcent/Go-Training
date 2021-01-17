@@ -37,7 +37,13 @@ func (db *userConnection) InsertUser(user model.User) model.User {
 }
 
 func (db *userConnection) UpdateUser(user model.User) model.User {
-	user.Password = hashPassword([]byte(user.Password))
+	if user.Password != "" {
+		user.Password = hashPassword([]byte(user.Password))
+	}else{
+		var tempUser model.User
+		db.connection.Find(&tempUser, user.ID)
+		user.Password = tempUser.Password
+	}
 	db.connection.Save(&user)
 
 	return user

@@ -13,7 +13,8 @@ type Response struct {
 // EmptyObj response
 type EmptyObj struct {}
 
-func responseSucces(status bool, msg string, data interface{}) Response {
+// ResponseSucces template if success
+func ResponseSucces(status bool, msg string, data interface{}) Response {
 	res := Response{
 		Status: status,
 		Message: msg,
@@ -24,7 +25,8 @@ func responseSucces(status bool, msg string, data interface{}) Response {
 	return res
 }
 
-func responseFailed(msg string, err string, data interface{}) Response {
+// ResponseFailed template if error
+func ResponseFailed(msg string, err string, data interface{}) Response {
 	splitError := strings.Split(err, "\n")
 	res := Response{
 		Status: false,
