@@ -1,2 +1,3 @@
 # Go-Training
-Training for develop RESTful API using Golang
+
+Training to develop RESTfull API using Golang and MySQL
