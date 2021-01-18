@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -8,25 +9,30 @@ import (
 	"../helper"
 	"../model"
 	"../service"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-// AuthController interface for login register user
+// AuthController interface for login, register, read, and update user
 type AuthController interface {
 	Login(ctx *gin.Context)
 	Register(ctx *gin.Context)
+	Update(ctx *gin.Context)
+	Get(ctx *gin.Context)
 }
 
 type authController struct {
 	authService service.AuthService
 	jwtService  service.JWTService
+	userService service.UserService
 }
 
 // NewAuth is like constructor of the model
-func NewAuth(authService service.AuthService, jwtService service.JWTService) AuthController {
+func NewAuth(authService service.AuthService, jwtService service.JWTService, userService service.UserService) AuthController {
 	return &authController{
 		authService,
 		jwtService,
+		userService,
 	}
 }
 
@@ -77,4 +83,45 @@ func (c *authController) Register(ctx *gin.Context) {
 		res := helper.ResponseSucces(true, "success", createUser)
 		ctx.JSON(http.StatusOK, res)
 	}
+}
+
+func (c *authController) Update(ctx *gin.Context) {
+	var newUser dto.UserUpdateDTO
+	err := ctx.ShouldBind(&newUser)
+	if err != nil {
+		res := helper.ResponseFailed("Failed to process", err.Error(), nil)
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
+		return
+	}
+
+	authHeader := ctx.GetHeader("Authorization")
+	token, errToken := c.jwtService.ValidateToken(authHeader)
+	if errToken != nil {
+		panic(errToken.Error())
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	id, errID := strconv.ParseUint(fmt.Sprintf("%v", claims["userID"]), 10, 64)
+	if errID != nil {
+		panic(errToken.Error())
+	}
+
+	newUser.ID = id
+	updateUser := c.userService.UpdateUser(newUser)
+	res := helper.ResponseSucces(true, "success", updateUser)
+	ctx.JSON(http.StatusOK, res)
+
+}
+
+func (c *authController) Get(ctx *gin.Context) {
+	authHeader := ctx.GetHeader("Authorization")
+	token, errToken := c.jwtService.ValidateToken(authHeader)
+	if errToken != nil {
+		panic(errToken.Error())
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	user := c.userService.GetUser(fmt.Sprintf("%v", claims["userID"]))
+	res := helper.ResponseSucces(true, "success", user)
+	ctx.JSON(http.StatusOK, res)
 }
