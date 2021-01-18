@@ -73,7 +73,7 @@ func (c *authController) Register(ctx *gin.Context) {
 	}
 
 	if !c.authService.IsDuplicateEmail(newUser.Email) {
-		res := helper.ResponseFailed("Email has ben registered", "Failed", nil)
+		res := helper.ResponseFailed("Email has been registered", "Failed", nil)
 		ctx.JSON(http.StatusConflict, res)
 	} else {
 		createUser := c.authService.CreateUser(newUser)
@@ -106,10 +106,15 @@ func (c *authController) Update(ctx *gin.Context) {
 		panic(errToken.Error())
 	}
 
-	newUser.ID = id
-	updateUser := c.userService.UpdateUser(newUser)
-	res := helper.ResponseSucces(true, "success", updateUser)
-	ctx.JSON(http.StatusOK, res)
+	if !c.authService.IsDuplicateEmail(newUser.Email) {
+		res := helper.ResponseFailed("Email has ben registered", "Failed", nil)
+		ctx.JSON(http.StatusConflict, res)
+	} else {
+		newUser.ID = id
+		updateUser := c.userService.UpdateUser(newUser)
+		res := helper.ResponseSucces(true, "success", updateUser)
+		ctx.JSON(http.StatusOK, res)
+	}
 
 }
 

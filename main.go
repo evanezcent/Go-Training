@@ -7,6 +7,7 @@ import (
 	"./controller"
 	"./repository"
 	"./service"
+	"./middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -16,7 +17,8 @@ var (
 	userRepository repository.UserRepository = repository.NewUserRepo(db)
 	jwtService     service.JWTService        = service.NewJwtService()
 	authService    service.AuthService       = service.NewAuthService(userRepository)
-	userController controller.AuthController = controller.NewAuth(authService, jwtService)
+	userService    service.UserService       = service.NewUserService(userRepository)
+	userController controller.AuthController = controller.NewAuth(authService, jwtService, userService)
 )
 
 func main() {
@@ -28,6 +30,12 @@ func main() {
 	{
 		authRoutes.POST("/login", userController.Login)
 		authRoutes.POST("/register", userController.Register)
+	}
+
+	userRoutes := r.Group("api/user", middleware.AuthorizeJWT(jwtService))
+	{
+		userRoutes.GET("/get", userController.Get)
+		userRoutes.PUT("/update", userController.Update)
 	}
 
 	r.Run()
