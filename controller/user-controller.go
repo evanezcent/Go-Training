@@ -99,7 +99,7 @@ func (c *authController) Update(ctx *gin.Context) {
 	if errToken != nil {
 		panic(errToken.Error())
 	}
-
+	
 	claims := token.Claims.(jwt.MapClaims)
 	id, errID := strconv.ParseUint(fmt.Sprintf("%v", claims["userID"]), 10, 64)
 	if errID != nil {
