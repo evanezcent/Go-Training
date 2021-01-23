@@ -119,6 +119,10 @@ func (c *authController) Update(ctx *gin.Context) {
 }
 
 func (c *authController) Get(ctx *gin.Context) {
+	// q := ctx.Request.URL.Query()
+	// for key, val := range q{
+	// 	fmt.Println(key, val[0])
+	// }
 	authHeader := ctx.GetHeader("Authorization")
 	token, errToken := c.jwtService.ValidateToken(authHeader)
 	if errToken != nil {
