@@ -34,7 +34,7 @@ func (db *bookConnection) InsertBook(book model.Book) model.Book {
 }
 
 func (db *bookConnection) UpdateBook(book model.Book) model.Book {
-	db.connection.Save(&book)
+	db.connection.Updates(&book)
 
 	// handle action to get the owner of the book (User)
 	db.connection.Preload("User").Find(&book)

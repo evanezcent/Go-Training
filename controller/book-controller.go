@@ -80,10 +80,7 @@ func (controller *bookController) Insert(ctx *gin.Context) {
 	} else {
 		authHeader := ctx.GetHeader("Authorization")
 		userID := controller.getUserIDFromToken(authHeader)
-		id, err := strconv.ParseUint(userID, 10, 64)
-		if err == nil {
-			newBook.UserID = id
-		}
+		newBook.UserID = userID
 
 		res := controller.bookService.InsertBook(newBook)
 		response := helper.ResponseSucces(true, "success", res)
@@ -93,6 +90,14 @@ func (controller *bookController) Insert(ctx *gin.Context) {
 
 func (controller *bookController) Update(ctx *gin.Context) {
 	var newBook dto.BookUpdateDTO
+	id, errID := strconv.ParseUint(ctx.Param("id"), 0, 0)
+	if errID != nil {
+		res := helper.ResponseFailed("ID not found", errID.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusNotFound, res)
+		return
+	}
+
+	newBook.ID = id
 	errDTO := ctx.ShouldBind(&newBook)
 
 	if errDTO != nil {
@@ -126,6 +131,14 @@ func (controller *bookController) Delete(ctx *gin.Context) {
 	if err != nil {
 		res := helper.ResponseFailed("Failed to get ID", "Invalid ID", helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, res)
+	}
+
+	// Check is the data exist
+	var checkBook model.Book = controller.bookService.FindBookByID(id)
+	if (checkBook == model.Book{}) {
+		res := helper.ResponseFailed("Data not found", "Wrong id", helper.EmptyObj{})
+		ctx.JSON(http.StatusNotFound, res)
+		return
 	}
 
 	book.ID = id
