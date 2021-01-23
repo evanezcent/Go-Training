@@ -13,7 +13,7 @@ import (
 // BookService interface for book service
 type BookService interface {
 	InsertBook(book dto.BookCreateDTO) model.Book
-	UpdateBook(book dto.BookCreateDTO) model.Book
+	UpdateBook(book dto.BookUpdateDTO) model.Book
 	DeleteBook(book model.Book)
 	GetAll() []model.Book
 	FindBookByID(id uint64) model.Book
@@ -43,7 +43,7 @@ func (service *bookService) InsertBook(book dto.BookCreateDTO) model.Book {
 	return updatedBook
 }
 
-func (service *bookService) UpdateBook(book dto.BookCreateDTO) model.Book {
+func (service *bookService) UpdateBook(book dto.BookUpdateDTO) model.Book {
 	newBook := model.Book{}
 	err := smapping.FillStruct(&newBook, smapping.MapFields(&book))
 
@@ -70,6 +70,6 @@ func (service *bookService) FindBookByID(id uint64) model.Book {
 func (service *bookService) AuthorizeForEdit(userID string, bookID uint64) bool {
 	book := service.bookRepository.FindBookByID(bookID)
 	id := fmt.Sprintf(book.UserID)
-	
+
 	return userID == id
 }
