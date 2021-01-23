@@ -75,7 +75,7 @@ func (db *userConnection) FindEmail(email string) model.User {
 
 func (db *userConnection) ProfileUser(id string) model.User {
 	var user model.User
-	db.connection.Find(&user, id)
+	db.connection.Preload("Books").Preload("Books.User").Find(&user, id)
 
 	return user
 }
